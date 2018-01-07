@@ -3,11 +3,7 @@ var inquirer = require("inquirer")
 var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
-
-  // Your username
   user: "root",
-
-  // Your password
   password: "",
   database: "bamazonDB"
 });
@@ -15,22 +11,20 @@ var connection = mysql.createConnection({
 connection.connect(function(err) {
   if (err) throw err;
   console.log("connected as id " + connection.threadId);
-  //afterConnection();
-  userMode();
+  productDisplay();
+  
 });
 
-// function afterConnection() {
-//   connection.query("SELECT * FROM products", function(err, res) {
-//     if (err) throw err;
-//     //console.log("HERE ARE OUR CURRENT PRODUCTS AND PRICES");
-//     for (var i = 0; i < res.length; i++) {
-//       console.log(res[i].item_id + " | " + res[i].product_name + " | " + res[i].price);
-//     }
-   
-//     //connection.end();
-//   });
-  
-// }
+function productDisplay() {
+  connection.query("SELECT * FROM products", function(err, res) {
+    if (err) throw err;
+    console.log("HERE ARE OUR CURRENT PRODUCTS AND PRICES");
+    for (var i = 0; i < res.length; i++) {
+      console.log(res[i].item_id + " | " + res[i].product_name + " | " + "$"+res[i].price);
+    }
+    userMode();
+  });
+}
 
 
 function userMode(){
@@ -38,25 +32,24 @@ function userMode(){
 	.prompt([{
 		name: "item_id",
 		type: "input",
-		message: "Enter the id of the item you'd like to buy."
+		message: "Enter the id of the item you'd like to view."
 	},	
 	{
 		name: "quantity",
 		type: "input",
-		message: "How many would you like to buy?"
+		message: "What quantity would you like to check?"
 	}
-
 	])
  	.then(function(answer){
  		var query = "SELECT product_name, price, stock_quantity FROM products WHERE ?";
  		connection.query (query, {item_id: answer.item_id}, function(err, res){
  			for (i = 0; i < res.length; i ++){
- 				console.log( "You have selected "+answer.quantity+" "+ res[i].product_name + " at a unit price of $" + res[i].price + " for a total cost of $"+answer.quantity*res[i].price+".");
- 				
+ 				if (answer.quantity > res[i].stock_quantity){console.log ("Insufficient quantity on-hand!! Re-try");
+ 				userMode();}
+ 					else {
+ 				console.log( "You have selected "+answer.quantity+" "+ res[i].product_name + " at a unit price of $" + res[i].price + " for a total cost of $"+answer.quantity*res[i].price+".");}		
  			}
  		});
-
-
  	});
  }
 
