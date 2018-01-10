@@ -21,7 +21,7 @@ function productDisplay() {
     console.log(res);
     console.log("HERE ARE OUR CURRENT PRODUCTS AND PRICES");
     for (var i = 0; i < res.length; i++) {
-      console.log(res[i].item_id + " | " + res[i].product_name + " | " + "$"+res[i].price);
+      console.log(res[i].item_id + " | " + res[i].stock_quantity + " " + res[i].product_name + " | " + "$"+res[i].price);
     }
     userMode();
   });
@@ -42,20 +42,20 @@ function userMode(){
  	.then(function(answer){
  		var query = "SELECT product_name, price, stock_quantity FROM products WHERE ?";
  		connection.query (query, {item_id: answer.item_id}, function(err, res){
-
- 			//for (i = 0; i < res.length; i ++){
  				if (answer.quantity > res[0].stock_quantity){
  					console.log ("Insufficient quantity on-hand!! Re-try");
  					userMode();
  				} else {
+ 					console.log("You hit the else statement")
+ 					console.log(answer);
  					console.log( "You have selected "+answer.quantity+" "+ res[0].product_name + " at a unit price of $" + res[0].price + " for a total cost of $"+answer.quantity*res[0].price+".");
-			 		//res[i].stock_quantity = res[i].stock_quantity - answer.quantity;
+			 	
 			 		var query = "UPDATE products SET ? WHERE ?";
 			 		
 			 		connection.query("UPDATE products SET ? WHERE ?",
 			 			[
 			 				{
-			 					stock_quantity: res.stock_quantity - answer.quantity,
+			 					stock_quantity: res[0].stock_quantity - answer.quantity,
 			 				},
 			 				{
 			 					item_id: answer.item_id
@@ -64,7 +64,7 @@ function userMode(){
 			 				
 			 			});		
 			 	}		
-			//}
+			
 		});
 
  	});
