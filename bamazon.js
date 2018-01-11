@@ -18,10 +18,9 @@ connection.connect(function(err) {
 function productDisplay() {
   connection.query("SELECT * FROM products", function(err, res) {
     if (err) throw err;
-    console.log(res);
     console.log("HERE ARE OUR CURRENT PRODUCTS AND PRICES");
     for (var i = 0; i < res.length; i++) {
-      console.log(res[i].item_id + " | " + res[i].stock_quantity + " " + res[i].product_name + " | " + "$"+res[i].price);
+      console.log(res[i].item_id + " | " +res[i].department_name +" | " +res[i].stock_quantity + " " + res[i].product_name + " | " + "$"+res[i].price);
     }
     userMode();
   });
@@ -31,12 +30,12 @@ function userMode(){
 	.prompt([{
 		name: "item_id",
 		type: "input",
-		message: "Enter the id of the item you'd like to view."
+		message: "Enter the id of the item you'd like to buy."
 	},	
 	{
 		name: "quantity",
 		type: "input",
-		message: "What quantity would you like to check?"
+		message: "What quantity would you like to buy?"
 	}
 	])
  	.then(function(answer){
@@ -46,8 +45,8 @@ function userMode(){
  					console.log ("Insufficient quantity on-hand!! Re-try");
  					userMode();
  				} else {
- 					console.log("You hit the else statement")
- 					console.log(answer);
+ 					
+ 					
  					console.log( "You have selected "+answer.quantity+" "+ res[0].product_name + " at a unit price of $" + res[0].price + " for a total cost of $"+answer.quantity*res[0].price+".");
 			 	
 			 		var query = "UPDATE products SET ? WHERE ?";
